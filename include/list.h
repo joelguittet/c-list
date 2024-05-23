@@ -57,8 +57,8 @@ then using the LIST_API_VISIBILITY flag to "export" the same symbols the way LIS
 
 */
 
-#define LIST_CDECL   __cdecl
-#define LIST_STDCALL __stdcall
+#define LIST_CDECL __cdecl
+#define LIST_STDCALL
 
 /* export symbols by default, this is necessary for copy pasting the C and header file */
 #if !defined(LIST_HIDE_SYMBOLS) && !defined(LIST_IMPORT_SYMBOLS) && !defined(LIST_EXPORT_SYMBOLS)
@@ -89,7 +89,11 @@ then using the LIST_API_VISIBILITY flag to "export" the same symbols the way LIS
 
 #include <stdint.h>
 #include <stdbool.h>
+#ifdef __WINDOWS__
+#include <windows.h>
+#else
 #include <semaphore.h>
+#endif
 
 /******************************************************************************/
 /* Definitions                                                                */
@@ -114,7 +118,11 @@ typedef struct list_s {
     size_t          count;                         /**< Number of elements in the list */
     bool            alloc;                         /**< Flag to indicate if elements are allocated when they are added in the list */
     bool (*sort)(struct list_s *, void *, void *); /**< Callback function invoked to sort elements of the list, NULL if not used */
-    sem_t sem;                                     /**< Semaphore used to protect the access to the list */
+#ifdef __WINDOWS__
+    HANDLE sem; /**< Semaphore used to protect the access to the list */
+#else
+    sem_t sem; /**< Semaphore used to protect the access to the list */
+#endif
 } list_t;
 
 /******************************************************************************/

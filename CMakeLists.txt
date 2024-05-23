@@ -39,54 +39,36 @@ list(GET PROJECT_VER_LIST 2 PROJECT_VER_PATCH)
 # Use GNU installation directories
 include(GNUInstallDirs)
 
+# Import CHECK_C_COMPILER_FLAG
+include(CheckCCompilerFlag)
+
 # Additional flags
 set(c_flags "${c_flags} -Os -ffunction-sections -Wall -fPIC")
 set(linker_flags "${linker_flags} -Wl,-gc-sections")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
+CHECK_C_COMPILER_FLAG("fvisibility" "FLAG_SUPPORTED_FVISIBILITY")
+if (FLAG_SUPPORTED_FVISIBILITY)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
+endif()
 
 # Definitions
 add_definitions(-DLIST_EXPORT_SYMBOLS -DLIST_API_VISIBILITY)
-
-# CMake subdirectories
-if(NOT TARGET amp)
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/lib/amp/CMakeLists.txt)
-        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/amp)
-    endif()
-endif()
-if(NOT TARGET axon)
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/lib/axon/CMakeLists.txt)
-        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/axon)
-    endif()
-endif()
-if(NOT TARGET discover)
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/lib/discover/CMakeLists.txt)
-        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/discover)
-    endif()
-endif()
 
 # List of sources
 file(GLOB_RECURSE src ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
 
 # Add include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/lib/amp/include)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/amp/include)
-endif()
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/lib/amp/lib/cJSON/cJSON.h)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/amp/lib/cJSON)
-endif()
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/lib/axon/include)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/axon/include)
-endif()
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/lib/discover/include)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/discover/include)
-endif()
 
 # Creation of the library
 add_library(list SHARED ${src})
 
 # Link the library with the wanted libraries
-target_link_libraries(list pthread)
+find_package(Threads REQUIRED)
+if (Threads_FOUND)
+    if (CMAKE_USE_PTHREADS_INIT)
+        target_link_libraries(list pthread)
+    endif()
+endif()
 
 # Properties of the library
 set_target_properties(list
