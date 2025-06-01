@@ -4,7 +4,7 @@
  *
  * MIT License
  *
- * Copyright (c) 2021-2023 joelguittet and c-list contributors
+ * Copyright joelguittet and c-list contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +101,7 @@ then using the LIST_API_VISIBILITY flag to "export" the same symbols the way LIS
 typedef struct list_element_s {
     struct list_element_s *prev; /**< Previous element of the list */
     struct list_element_s *next; /**< Next element of the list */
-    void *                 e;    /**< Element itself */
+    void                  *e;    /**< Element itself */
 } list_element_t;
 
 /**
