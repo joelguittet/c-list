@@ -24,18 +24,16 @@ Provide lists support in C.
 
 ## Building
 
-Build `liblist.so` with the following commands:
+On Linux/Windows build `liblist.so`/`list.dll` with the following commands:
 
 ``` bash
-mkdir build
-cd build
-cmake ..
-make
+cmake -B build .
+cmake --build build
 ```
 
 ## Installing
 
-Install `liblist.so` with the following commands:
+On Linux install `liblist.so` with the following commands:
 
 ``` bash
 make install
@@ -44,11 +42,10 @@ make install
 ## Examples
 
 Build examples with the following commands:
+
 ``` bash
-mkdir build
-cd build
-cmake -DENABLE_LIST_EXAMPLES=ON .
-make
+cmake -B build -DENABLE_LIST_EXAMPLES=ON .
+cmake --build build
 ```
 
 ### list_sort

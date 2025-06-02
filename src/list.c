@@ -38,6 +38,22 @@
 #include "list.h"
 
 /******************************************************************************/
+/* Definitions                                                                */
+/******************************************************************************/
+
+#ifdef __WINDOWS__
+#define SEM_INIT(sem)  sem = CreateSemaphore(NULL, 1, 1, NULL)
+#define SEM_WAIT(sem)  WaitForSingleObject(sem, INFINITE)
+#define SEM_POST(sem)  ReleaseSemaphore(sem, 1, NULL)
+#define SEM_CLOSE(sem) CloseHandle(sem)
+#else
+#define SEM_INIT(sem)  sem_init(&sem, 0, 1)
+#define SEM_WAIT(sem)  sem_wait(&sem)
+#define SEM_POST(sem)  sem_post(&sem)
+#define SEM_CLOSE(sem) sem_close(&sem)
+#endif
+
+/******************************************************************************/
 /* Prototypes                                                                 */
 /******************************************************************************/
 
@@ -78,7 +94,7 @@ list_create(bool alloc, bool (*sort)(list_t *, void *, void *)) {
     list->sort = sort;
 
     /* Initialize semaphore used to access the list */
-    sem_init(&list->sem, 0, 1);
+    SEM_INIT(list->sem);
 
     return list;
 }
@@ -104,7 +120,7 @@ list_add(list_t *list, void *e, size_t size) {
     }
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Add element to the list */
     if (NULL == list->first) {
@@ -140,7 +156,7 @@ ADDED:
     list->count++;
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return 0;
 }
@@ -166,7 +182,7 @@ list_add_head(list_t *list, void *e, size_t size) {
     }
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Add element to the list */
     if (NULL == list->first) {
@@ -179,7 +195,7 @@ list_add_head(list_t *list, void *e, size_t size) {
     list->count++;
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return 0;
 }
@@ -205,7 +221,7 @@ list_add_tail(list_t *list, void *e, size_t size) {
     }
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Add element to the list */
     if (NULL == list->last) {
@@ -218,7 +234,7 @@ list_add_tail(list_t *list, void *e, size_t size) {
     list->count++;
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return 0;
 }
@@ -236,13 +252,13 @@ list_get_count(list_t *list) {
     size_t count = 0;
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Get number of elements */
     count = list->count;
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return count;
 }
@@ -260,7 +276,7 @@ list_get_head(list_t *list) {
     void *e = NULL;
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Get head list element */
     list->curr = list->first;
@@ -271,7 +287,7 @@ list_get_head(list_t *list) {
     }
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return e;
 }
@@ -289,7 +305,7 @@ list_get_tail(list_t *list) {
     void *e = NULL;
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Get last list element */
     list->curr = list->last;
@@ -300,7 +316,7 @@ list_get_tail(list_t *list) {
     }
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return e;
 }
@@ -318,7 +334,7 @@ list_get_next(list_t *list) {
     void *e = NULL;
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Get next list element */
     if (NULL != list->curr) {
@@ -331,7 +347,7 @@ list_get_next(list_t *list) {
     }
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return e;
 }
@@ -349,7 +365,7 @@ list_get_prev(list_t *list) {
     void *e = NULL;
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Get previous list element */
     if (NULL != list->curr) {
@@ -362,7 +378,7 @@ list_get_prev(list_t *list) {
     }
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return e;
 }
@@ -380,7 +396,7 @@ list_remove(list_t *list, void *e) {
     void *ret = NULL;
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Search for the list element in the list */
     list_element_t *tmp = list->first;
@@ -392,7 +408,7 @@ list_remove(list_t *list, void *e) {
     }
     if (NULL == tmp) {
         /* The element is not part of the list */
-        sem_post(&list->sem);
+        SEM_POST(list->sem);
         return NULL;
     }
 
@@ -430,7 +446,7 @@ list_remove(list_t *list, void *e) {
     free(tmp);
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return ret;
 }
@@ -448,7 +464,7 @@ list_remove_head(list_t *list) {
     void *e = NULL;
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Update current element if required */
     if ((NULL != list->curr) && (list->curr == list->first)) {
@@ -474,7 +490,7 @@ list_remove_head(list_t *list) {
     }
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return e;
 }
@@ -492,7 +508,7 @@ list_remove_tail(list_t *list) {
     void *e = NULL;
 
     /* Wait semaphore */
-    sem_wait(&list->sem);
+    SEM_WAIT(list->sem);
 
     /* Update current element if required */
     if ((NULL != list->curr) && (list->curr == list->last)) {
@@ -518,7 +534,7 @@ list_remove_tail(list_t *list) {
     }
 
     /* Release semaphore */
-    sem_post(&list->sem);
+    SEM_POST(list->sem);
 
     return e;
 }
@@ -534,7 +550,7 @@ list_release(list_t *list) {
     if (NULL != list) {
 
         /* Wait semaphore */
-        sem_wait(&list->sem);
+        SEM_WAIT(list->sem);
 
         /* Release list elements */
         list_element_t *list_element = list->first;
@@ -548,8 +564,8 @@ list_release(list_t *list) {
         }
 
         /* Release semaphore */
-        sem_post(&list->sem);
-        sem_close(&list->sem);
+        SEM_POST(list->sem);
+        SEM_CLOSE(list->sem);
 
         /* Release list instance */
         free(list);
