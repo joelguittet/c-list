@@ -1,6 +1,7 @@
 # c-list
 
-[![CI Badge](https://github.com/joelguittet/c-list/workflows/ci/badge.svg)](https://github.com/joelguittet/c-list/actions)
+[![Workflow check-code-format Badge](https://github.com/joelguittet/c-list/workflows/check-code-format/badge.svg)](https://github.com/joelguittet/c-list/actions)
+[![Workflow build Badge](https://github.com/joelguittet/c-list/workflows/build/badge.svg)](https://github.com/joelguittet/c-list/actions)
 [![Issues Badge](https://img.shields.io/github/issues/joelguittet/c-list)](https://github.com/joelguittet/c-list/issues)
 [![License Badge](https://img.shields.io/github/license/joelguittet/c-list)](https://github.com/joelguittet/c-list/blob/master/LICENSE)
 
