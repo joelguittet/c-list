@@ -93,12 +93,15 @@ main(int argc, char **argv) {
 
 /**
  * Sort element of the list
+ * @param list The list
  * @param curr Current element in the list
  * @param e New element to be added in the list
  * @return true if the new element should be added before the current element, false otherwise
  */
 static bool
-sort(list_t *l, void *curr, void *e) {
+sort(list_t *list, void *curr, void *e) {
+
+    (void)list;
 
     /* Elements are ordered alphabetically by name */
     return (strcmp((char *)curr, (char *)e) < 0) ? true : false;
